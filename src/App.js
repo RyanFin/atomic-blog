@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { faker } from "@faker-js/faker";
 
 function createRandomPost() {
@@ -8,7 +8,8 @@ function createRandomPost() {
   };
 }
 
-// Create a new Context!
+// 1) INITIALISE A NEW CONTEXT TO STORE VALUES
+// You can also create a second context to handle searches e.g. SearchContext
 const PostContext = createContext();
 
 function App() {
@@ -45,9 +46,8 @@ function App() {
   );
 
   return (
-    // Provide value to the child components
+    // 2) SET THE CONTEXT VALUES WITHIN A TOP-LEVEL PROVIDER
     <PostContext.Provider
-      // Set context values
       value={{
         posts: searchedPosts,
         onAddPost: handleAddPost,
@@ -64,12 +64,7 @@ function App() {
           {isFakeDark ? "☀️" : "🌙"}
         </button>
 
-        <Header
-          posts={searchedPosts}
-          onClearPosts={handleClearPosts}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-        />
+        <Header />
         <Main posts={searchedPosts} onAddPost={handleAddPost} />
         <Archive onAddPost={handleAddPost} />
         <Footer />
@@ -78,25 +73,29 @@ function App() {
   );
 }
 
-function Header({ posts, onClearPosts, searchQuery, setSearchQuery }) {
+function Header() {
+  // 3) CONSUMING THE CONTEXT VALUES IN CHILD COMPONENTS
+  // const x = useContext(PostContext);
+  // destructure properties from context array and get values stored in the global context
+  const { onClearPosts } = useContext(PostContext);
+
   return (
     <header>
       <h1>
         <span>⚛️</span>The Atomic Blog
       </h1>
       <div>
-        <Results posts={posts} />
-        <SearchPosts
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-        />
+        <Results />
+        <SearchPosts />
         <button onClick={onClearPosts}>Clear posts</button>
       </div>
     </header>
   );
 }
 
-function SearchPosts({ searchQuery, setSearchQuery }) {
+function SearchPosts() {
+  // consume values from the PostContext context
+  const { searchQuery, setSearchQuery } = useContext(PostContext);
   return (
     <input
       value={searchQuery}
@@ -106,7 +105,8 @@ function SearchPosts({ searchQuery, setSearchQuery }) {
   );
 }
 
-function Results({ posts }) {
+function Results() {
+  const { posts } = useContext(PostContext);
   return <p>🚀 {posts.length} atomic posts found</p>;
 }
 
