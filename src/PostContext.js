@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker";
-import React, { createContext, useState } from "react";
+import React, { createContext, useContext, useState } from "react";
 
 function createRandomPost() {
   return {
@@ -52,4 +52,14 @@ function PostProvider({ children }) {
   );
 }
 
-export { PostProvider, PostContext };
+// create a custom hook so that we don't have to keep destructing items that gain access to PostContext, such as: const { onAddPost } = useContext(PostContext); as this gets annoying
+
+function usePosts() {
+  const context = useContext(PostContext);
+  if (context === undefined)
+    throw new Error("PostContext was used outside of the PostProvider");
+
+  return context;
+}
+
+export { PostProvider, usePosts };
